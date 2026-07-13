@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Football Globe - Realistic Day</title>
+    <title>Football Globe - Realistic Day Edition</title>
     <style>
         body { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: 'Arial', sans-serif; color: #fff; }
         #globeViz { width: 100vw; height: 100vh; cursor: grab; }
@@ -43,7 +43,7 @@
 
     <div id="loading">Φόρτωση χάρτη...</div>
     <div id="globeViz"></div>
-    <div id="instructions">Κάνε κλικ σε μια χώρα για περιήγηση στις ομάδες.</div>
+    <div id="instructions">Κάνε κλικ σε μια χώρα. Περίμενε το animation να ολοκληρωθεί.</div>
 
     <div id="teamSidebar">
         <div class="close-btn" id="closeSidebar">&times;</div>
@@ -82,57 +82,57 @@
 
             world = Globe()
                 (document.getElementById('globeViz'))
-                // ΥΨΗΛΗΣ ΑΝΑΛΥΣΗΣ ΡΕΑΛΙΣΤΙΚΟΣ ΗΜΕΡΗΣΙΟΣ ΧΑΡΤΗΣ
                 .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
                 .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
                 .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
                 
-                // Ατμόσφαιρα (ελαφριά γαλάζια λάμψη)
                 .showAtmosphere(true)
                 .atmosphereColor('#87CEEB')
                 .atmosphereAltitude(0.15)
                 .pointOfView({ lat: 38, lng: 23, altitude: 2 })
                 
-                // ΠΟΛΥΓΩΝΑ (Σύνορα): Εντελώς διάφανα για να φαίνεται η πραγματική γη!
                 .polygonsData(countriesData.features)
                 .polygonAltitude(0.005)
-                .polygonCapColor(() => 'rgba(255, 255, 255, 0)') // Διάφανο
-                .polygonSideColor(() => 'rgba(255, 255, 255, 0)') // Διάφανο
-                .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.1)') // Αχνά λευκά σύνορα
+                .polygonCapColor(() => 'rgba(255, 255, 255, 0)')
+                .polygonSideColor(() => 'rgba(255, 255, 255, 0)')
+                .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.15)')
                 .onPolygonHover(hoverD => {
-                    // Φωτίζει ελαφρώς τη χώρα όταν περνάς το ποντίκι
                     world.polygonCapColor(d => d === hoverD ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0)');
                 })
                 .onPolygonClick(polygon => {
                     const countryName = polygon.properties.ADMIN;
                     const teamsInCountry = allTeams.filter(team => team.country === countryName);
                     
-                    // Εμφανίζει τις ομάδες μόνο αυτής της χώρας
                     world.labelsData(teamsInCountry);
                     
-                    const [lat, lng] = [polygon.properties.LABEL_Y, polygon.properties.LABEL_X];
-                    if(lat && lng) {
-                        // ΤΟ ANIMATION ΤΟΥ ΖΟΥΜ: 1.5 δευτερόλεπτο (1500ms). Altitude 0.5 (το ιδανικό ύψος!)
-                        world.pointOfView({ lat: lat, lng: lng, altitude: 0.5 }, 1500);
+                    // ΝΕΟ, ΕΓΓΥΗΜΕΝΟ ΑΝΙΜΑΤΙΟΝ ΖΟΥΜ
+                    if(teamsInCountry.length > 0) {
+                        // Βρίσκει το ακριβές κέντρο των γηπέδων για να κάνει τέλειο focus
+                        const centerLat = teamsInCountry.reduce((sum, t) => sum + t.lat, 0) / teamsInCountry.length;
+                        const centerLng = teamsInCountry.reduce((sum, t) => sum + t.lng, 0) / teamsInCountry.length;
+                        
+                        // 1500 = 1.5 δευτερόλεπτο διάρκεια animation. 
+                        // altitude: 0.6 = Αρκετά κοντά για να μη γίνονται οι τελείες χαμός, αλλά όχι τόσο ώστε να πιξελάρει η ξηρά.
+                        world.pointOfView({ lat: centerLat, lng: centerLng, altitude: 0.6 }, 1500);
                     }
                 })
 
-                // ΟΜΑΔΕΣ (Πινέζες & Γράμματα)
-                .labelsData([]) // Άδειο μέχρι να πατήσεις χώρα
+                // ΤΕΛΟΣ ΣΤΟ ΧΑΟΣ: ΜΟΝΟ ΚΑΘΑΡΕΣ ΤΕΛΕΙΕΣ
+                .labelsData([])
                 .labelLat(d => d.lat)
                 .labelLng(d => d.lng)
-                .labelText(d => d.team_name)
-                .labelSize(0.8) // Μικρό μέγεθος για να μην πέφτει το ένα πάνω στο άλλο
-                .labelDotRadius(0.3)
-                .labelColor(d => d.id === 'aek_athens' ? '#F3D11A' : '#ffffff')
+                .labelText(() => '') // Κρύβει τα μόνιμα γράμματα!
+                .labelSize(0) 
+                .labelDotRadius(0.3) // Κομψό μέγεθος τελείας
+                .labelColor(d => d.id === 'aek_athens' ? '#F3D11A' : '#ff3366') // Κίτρινο για ΑΕΚ, Κόκκινο για τις άλλες
                 .labelResolution(2)
                 .onLabelClick(team => {
-                    // Ελαφρύ ζουμ στο γήπεδο
-                    world.pointOfView({ lat: team.lat, lng: team.lng, altitude: 0.2 }, 1000);
+                    world.pointOfView({ lat: team.lat, lng: team.lng, altitude: 0.3 }, 1000);
                     showSidebar(team);
                 })
+                // Τα ονόματα φαίνονται ΜΟΝΟ όταν περνάς το ποντίκι
                 .labelLabel(d => `
-                    <div style="background: rgba(0,0,0,0.9); padding: 8px 12px; border-radius: 6px; border: 1px solid ${d.id === 'aek_athens' ? '#F3D11A' : '#fff'}; text-align: center;">
+                    <div style="background: rgba(0,0,0,0.9); padding: 8px 12px; border-radius: 6px; border: 1px solid ${d.id === 'aek_athens' ? '#F3D11A' : '#444'}; text-align: center;">
                         <b style="font-size: 15px; color: ${d.id === 'aek_athens' ? '#F3D11A' : '#fff'};">${d.team_name}</b><br/>
                         <span style="font-size: 12px; color: #bbb;">${d.stadium}</span>
                     </div>
