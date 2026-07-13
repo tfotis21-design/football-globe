@@ -1,77 +1,92 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Football Globe - Live Data</title>
-    <style>
-        body { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: Arial, sans-serif; color: #fff; }
-        #globeViz { width: 100vw; height: 100vh; }
-        /* (Βάλε εδώ ακριβώς το ίδιο CSS που είχαμε στο προηγούμενο βήμα για το Sidebar κλπ) */
-
-        #loading {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 24px;
-            z-index: 100;
-        }
-    </style>
-    <script src="https://unpkg.com/globe.gl"></script>
-</head>
-<body>
-
-    <div id="loading">Φόρτωση δεδομένων από το Web...</div>
-    <div id="globeViz"></div>
-
-    <!-- (Βάλε εδώ ακριβώς το ίδιο HTML για το <div id="teamSidebar">...</div>) -->
-
-    <script>
-        // Το URL από όπου θα διαβάζει τα δεδομένα.
-        // Όταν το ανεβάσεις, αυτό θα τραβάει το JSON αρχείο σου από τον server του GitHub!
-        const DATA_URL = 'teams.json';
-
-        // Χρησιμοποιούμε το Fetch API της Javascript για να πάρουμε τα δεδομένα οπίσθια
-        fetch(DATA_URL)
-            .then(response => response.json())
-            .then(teamData => {
-
-                // Κρύβουμε το μήνυμα φόρτωσης
-                document.getElementById('loading').style.display = 'none';
-
-                // Δημιουργούμε την υδρόγειο ΤΩΡΑ, αφού ήρθαν τα δεδομένα
-                const world = Globe()
-                    (document.getElementById('globeViz'))
-                    .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg')
-                    .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
-                    .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
-                    .pointOfView({ lat: 20, lng: -20, altitude: 2 })
-                    .labelsData(teamData) // Περνάμε τα live δεδομένα!
-                    .labelLat(d => d.lat)
-                    .labelLng(d => d.lng)
-                    .labelText(d => d.team_name)
-                    .labelSize(d => 1.5)
-                    .labelDotRadius(d => 0.6)
-                    .labelColor(() => 'rgba(255, 255, 255, 0.8)')
-                    .labelResolution(2)
-                    .onLabelClick(team => {
-                        world.pointOfView({ lat: team.lat, lng: team.lng, altitude: 0.8 }, 1000);
-                        // showSidebar(team); // Εδώ καλείς τη συνάρτηση για το μενού
-                    })
-                    .labelLabel(d => `
-                        <div style="background: rgba(0,0,0,0.8); padding: 5px 10px; border-radius: 4px; border: 1px solid #444;">
-                            <b>${d.team_name}</b><br/>
-                            <span style="font-size: 12px; color: #aaa;">${d.city}, ${d.country}</span>
-                        </div>
-                    `);
-
-                world.controls().autoRotate = true;
-                world.controls().autoRotateSpeed = 0.5;
-            })
-            .catch(error => {
-                console.error("Σφάλμα κατά τη φόρτωση των δεδομένων:", error);
-                document.getElementById('loading').innerText = "Αποτυχία φόρτωσης δεδομένων.";
-            });
-    </script>
-</body>
-</html>
+[
+    {
+        "id": "real_madrid",
+        "team_name": "Real Madrid",
+        "country": "Spain",
+        "city": "Madrid",
+        "stadium": "Santiago Bernabéu",
+        "lat": 40.453054,
+        "lng": -3.688344,
+        "trophies": "🏆 15x Champions League"
+    },
+    {
+        "id": "milan",
+        "team_name": "AC Milan",
+        "country": "Italy",
+        "city": "Milan",
+        "stadium": "San Siro",
+        "lat": 45.478080,
+        "lng": 9.123988,
+        "trophies": "🏆 7x Champions League"
+    },
+    {
+        "id": "bayern_munich",
+        "team_name": "Bayern Munich",
+        "country": "Germany",
+        "city": "Munich",
+        "stadium": "Allianz Arena",
+        "lat": 48.218775,
+        "lng": 11.624753,
+        "trophies": "🏆 6x Champions League"
+    },
+    {
+        "id": "liverpool",
+        "team_name": "Liverpool",
+        "country": "England",
+        "city": "Liverpool",
+        "stadium": "Anfield",
+        "lat": 53.430829,
+        "lng": -2.960830,
+        "trophies": "🏆 6x Champions League"
+    },
+    {
+        "id": "aek_athens",
+        "team_name": "AEK Athens",
+        "country": "Greece",
+        "city": "Athens",
+        "stadium": "OPAP Arena",
+        "lat": 38.036100,
+        "lng": 23.743100,
+        "trophies": ""
+    },
+    {
+        "id": "olympiacos",
+        "team_name": "Olympiacos",
+        "country": "Greece",
+        "city": "Piraeus",
+        "stadium": "Karaiskakis Stadium",
+        "lat": 37.946500,
+        "lng": 23.664400,
+        "trophies": ""
+    },
+    {
+        "id": "boca_juniors",
+        "team_name": "Boca Juniors",
+        "country": "Argentina",
+        "city": "Buenos Aires",
+        "stadium": "La Bombonera",
+        "lat": -34.635650,
+        "lng": -58.364650,
+        "trophies": "🏆 6x Copa Libertadores"
+    },
+    {
+        "id": "independiente",
+        "team_name": "Independiente",
+        "country": "Argentina",
+        "city": "Avellaneda",
+        "stadium": "Libertadores de América",
+        "lat": -34.670267,
+        "lng": -58.371153,
+        "trophies": "🏆 7x Copa Libertadores"
+    },
+    {
+        "id": "flamengo",
+        "team_name": "Flamengo",
+        "country": "Brazil",
+        "city": "Rio de Janeiro",
+        "stadium": "Maracanã",
+        "lat": -22.912167,
+        "lng": -43.230164,
+        "trophies": "🏆 3x Copa Libertadores"
+    }
+]
