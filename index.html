@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Football Globe - Premium</title>
+    <title>Football Globe - Night Edition</title>
     <style>
-        body { margin: 0; padding: 0; overflow: hidden; background-color: #050505; font-family: 'Arial', sans-serif; color: #fff; }
+        body { margin: 0; padding: 0; overflow: hidden; background-color: #020202; font-family: 'Arial', sans-serif; color: #fff; }
         #globeViz { width: 100vw; height: 100vh; }
         
         #teamSidebar {
@@ -91,19 +91,25 @@
 
             world = Globe()
                 (document.getElementById('globeViz'))
-                .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg')
+                // ΝΕΟΣ ΧΑΡΤΗΣ ΜΕ ΦΩΤΑ ΠΟΛΕΩΝ
+                .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
                 .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
                 .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
-                .pointOfView({ lat: 38, lng: 23, altitude: 2 })
                 
-                // 1. Polygons (Σύνορα Χωρών)
+                // ΕΝΕΡΓΟΠΟΙΗΣΗ ΑΤΜΟΣΦΑΙΡΑΣ (Μπλε λάμψη)
+                .showAtmosphere(true)
+                .atmosphereColor('#3a86ff')
+                .atmosphereAltitude(0.15)
+                .pointOfView({ lat: 38, lng: 23, altitude: 2.5 })
+                
+                // ΣΥΝΟΡΑ ΧΩΡΩΝ (Διάφανα πλέον, φωτίζουν μόνο στο hover)
                 .polygonsData(countriesData.features)
-                .polygonAltitude(0.01)
-                .polygonCapColor(feat => 'rgba(10, 20, 30, 0.4)')
-                .polygonSideColor(() => 'rgba(0, 0, 0, 0.1)')
-                .polygonStrokeColor(() => '#333')
+                .polygonAltitude(0.005)
+                .polygonCapColor(() => 'rgba(0, 0, 0, 0)') // Εντελώς διάφανο για να φαίνονται τα φώτα
+                .polygonSideColor(() => 'rgba(0, 0, 0, 0)')
+                .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.1)') // Αχνά σύνορα
                 .onPolygonHover(hoverD => {
-                    world.polygonCapColor(d => d === hoverD ? 'rgba(40, 80, 120, 0.8)' : 'rgba(10, 20, 30, 0.4)');
+                    world.polygonCapColor(d => d === hoverD ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0)');
                 })
                 .onPolygonClick(polygon => {
                     const countryName = polygon.properties.ADMIN;
@@ -115,22 +121,21 @@
                     }
                 })
 
-                // 2. Πινέζες Ομάδων (ΧΩΡΙΣ τα μόνιμα μεγάλα γράμματα)
+                // ΠΙΝΕΖΕΣ (Έντονο χρώμα όπως το BattleBots)
                 .labelsData([])
                 .labelLat(d => d.lat)
                 .labelLng(d => d.lng)
-                .labelText(() => '') // Αφαιρέσαμε τα γράμματα για να είναι καθαρό!
+                .labelText(() => '') 
                 .labelSize(0)
-                .labelDotRadius(0.8) // Κάναμε την τελεία ελαφρώς πιο μεγάλη
-                .labelColor(() => '#ffffff')
+                .labelDotRadius(0.8)
+                .labelColor(() => '#ff0055') // Έντονο νέον ροζ/κόκκινο
                 .labelResolution(2)
                 .onLabelClick(team => {
                     world.pointOfView({ lat: team.lat, lng: team.lng, altitude: 0.4 }, 1000);
                     showSidebar(team);
                 })
-                // Εδώ φτιάχνουμε το Tooltip (εμφανίζεται μόνο όταν περνάς το ποντίκι)
                 .labelLabel(d => `
-                    <div style="background: rgba(0,0,0,0.9); padding: 8px 12px; border-radius: 6px; border: 1px solid #555; text-align: center;">
+                    <div style="background: rgba(0,0,0,0.9); padding: 8px 12px; border-radius: 6px; border: 1px solid #ff0055; text-align: center;">
                         <b style="font-size: 15px; color: #fff;">${d.team_name}</b><br/>
                         <span style="font-size: 12px; color: #bbb;">${d.stadium}</span>
                     </div>
@@ -155,6 +160,7 @@
                     trophiesDiv.style.display = "none";
                 }
 
+                // Εικόνα Φανέλας
                 const jerseyImg = document.getElementById('jerseyImage');
                 if (team.jersey_url && team.jersey_url !== "") {
                     jerseyImg.src = team.jersey_url;
@@ -168,7 +174,7 @@
                    sidebar.style.borderLeftColor = '#F3D11A';
                 } else {
                    document.getElementById('sidebarTeamName').style.color = '#fff';
-                   sidebar.style.borderLeftColor = '#333';
+                   sidebar.style.borderLeftColor = '#ff0055'; // Ταιριάζει με τις κόκκινες πινέζες
                 }
 
                 sidebar.classList.add('active');
