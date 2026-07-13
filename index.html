@@ -3,28 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Football Globe - Ultra HD & Animations</title>
+    <title>Football Globe - Realistic Day</title>
     <style>
-        body { margin: 0; padding: 0; overflow: hidden; background-color: #020202; font-family: 'Arial', sans-serif; color: #fff; }
+        body { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: 'Arial', sans-serif; color: #fff; }
         #globeViz { width: 100vw; height: 100vh; cursor: grab; }
         #globeViz:active { cursor: grabbing; }
         
-        /* Sidebar Styling */
         #teamSidebar {
             position: absolute; top: 0; right: -400px; width: 350px; height: 100vh;
-            background: rgba(10, 10, 10, 0.95); border-left: 2px solid #333;
+            background: rgba(15, 15, 15, 0.95); border-left: 2px solid #333;
             transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             padding: 25px; box-sizing: border-box; z-index: 10; overflow-y: auto;
             backdrop-filter: blur(5px);
         }
         #teamSidebar.active { right: 0; }
+        
         .close-btn { position: absolute; top: 15px; right: 20px; cursor: pointer; font-size: 28px; color: #888; transition: color 0.2s; }
         .close-btn:hover { color: #fff; }
         
         .team-header { text-align: center; margin-bottom: 15px; }
         .team-name { font-size: 26px; font-weight: 900; margin: 10px 0 2px 0; text-transform: uppercase; letter-spacing: 1px; }
-        .team-league { font-size: 13px; color: #00e5ff; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
-        .team-country { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        .team-league { font-size: 13px; color: #aaa; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
+        .team-country { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; }
         
         .team-trophies { font-size: 13px; color: #FFD700; font-weight: bold; margin-top: 10px; background: rgba(255, 215, 0, 0.05); padding: 8px; border-radius: 5px; display: none; border: 1px solid rgba(255, 215, 0, 0.2); }
         .jersey-container { width: 100%; height: 280px; background: transparent; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; position: relative; }
@@ -35,48 +35,15 @@
         .info-value { font-size: 15px; font-weight: bold; }
         
         #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px; z-index: 100; color: #fff; background: rgba(0,0,0,0.8); padding: 15px 30px; border-radius: 30px; }
-        #instructions { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 14px; color: #aaa; pointer-events: none; background: rgba(0,0,0,0.6); padding: 8px 16px; border-radius: 20px; }
-
-        /* HTML CSS MARKERS ΓΙΑ ΤΙΣ ΟΜΑΔΕΣ (Λύνει το πρόβλημα ανάλυσης) */
-        .custom-marker {
-            position: relative;
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .custom-marker:hover {
-            transform: scale(1.5);
-        }
-        .marker-tooltip {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.9);
-            color: #fff;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 13px;
-            font-weight: bold;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s;
-            border: 1px solid;
-        }
-        .custom-marker:hover .marker-tooltip {
-            opacity: 1;
-        }
+        #instructions { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 14px; color: #ccc; pointer-events: none; background: rgba(0,0,0,0.6); padding: 8px 16px; border-radius: 20px; }
     </style>
     <script src="https://unpkg.com/globe.gl"></script>
 </head>
 <body>
 
-    <div id="loading">Φόρτωση υψηλής ανάλυσης...</div>
+    <div id="loading">Φόρτωση χάρτη...</div>
     <div id="globeViz"></div>
-    <div id="instructions">Κάνε κλικ σε μια χώρα για Smooth Zoom.</div>
+    <div id="instructions">Κάνε κλικ σε μια χώρα για περιήγηση στις ομάδες.</div>
 
     <div id="teamSidebar">
         <div class="close-btn" id="closeSidebar">&times;</div>
@@ -115,61 +82,62 @@
 
             world = Globe()
                 (document.getElementById('globeViz'))
-                .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-water.png') // Δείχνει μόνο νερό
+                // ΥΨΗΛΗΣ ΑΝΑΛΥΣΗΣ ΡΕΑΛΙΣΤΙΚΟΣ ΗΜΕΡΗΣΙΟΣ ΧΑΡΤΗΣ
+                .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+                .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
                 .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
+                
+                // Ατμόσφαιρα (ελαφριά γαλάζια λάμψη)
                 .showAtmosphere(true)
-                .atmosphereColor('#3a86ff')
+                .atmosphereColor('#87CEEB')
                 .atmosphereAltitude(0.15)
                 .pointOfView({ lat: 38, lng: 23, altitude: 2 })
                 
-                // ΠΟΛΥΓΩΝΑ: Γεμίζουμε τις χώρες με σκούρο διανυσματικό χρώμα. ΤΕΡΜΑ ΤΑ ΠΙΞΕΛΣ!
+                // ΠΟΛΥΓΩΝΑ (Σύνορα): Εντελώς διάφανα για να φαίνεται η πραγματική γη!
                 .polygonsData(countriesData.features)
-                .polygonAltitude(0.01)
-                .polygonCapColor(() => '#0a0d14') // Σκούρο, κομψό χρώμα ξηράς
-                .polygonSideColor(() => 'rgba(0, 0, 0, 0)')
-                .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.15)')
+                .polygonAltitude(0.005)
+                .polygonCapColor(() => 'rgba(255, 255, 255, 0)') // Διάφανο
+                .polygonSideColor(() => 'rgba(255, 255, 255, 0)') // Διάφανο
+                .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.1)') // Αχνά λευκά σύνορα
                 .onPolygonHover(hoverD => {
-                    world.polygonCapColor(d => d === hoverD ? '#1a2233' : '#0a0d14');
+                    // Φωτίζει ελαφρώς τη χώρα όταν περνάς το ποντίκι
+                    world.polygonCapColor(d => d === hoverD ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0)');
                 })
                 .onPolygonClick(polygon => {
                     const countryName = polygon.properties.ADMIN;
                     const teamsInCountry = allTeams.filter(team => team.country === countryName);
                     
-                    // Εμφάνιση των καθαρών HTML markers
-                    world.htmlElementsData(teamsInCountry);
+                    // Εμφανίζει τις ομάδες μόνο αυτής της χώρας
+                    world.labelsData(teamsInCountry);
                     
                     const [lat, lng] = [polygon.properties.LABEL_Y, polygon.properties.LABEL_X];
                     if(lat && lng) {
-                        // ANIMATION: Smooth ζουμ διάρκειας 1.5 δευτερολέπτου (1500ms)
-                        world.pointOfView({ lat: lat, lng: lng, altitude: 0.15 }, 1500);
+                        // ΤΟ ANIMATION ΤΟΥ ΖΟΥΜ: 1.5 δευτερόλεπτο (1500ms). Altitude 0.5 (το ιδανικό ύψος!)
+                        world.pointOfView({ lat: lat, lng: lng, altitude: 0.5 }, 1500);
                     }
                 })
 
-                // ΧΡΗΣΗ HTML ΣΤΟΙΧΕΙΩΝ (Τέλειες τελείες που δεν παραμορφώνονται)
-                .htmlElement(d => {
-                    const el = document.createElement('div');
-                    
-                    // Χρωματισμός: Κίτρινο για ΑΕΚ, Ροζ/Κόκκινο για τους άλλους
-                    const color = d.id === 'aek_athens' ? '#F3D11A' : '#ff0055';
-                    
-                    el.innerHTML = `
-                        <div class="custom-marker" style="background: ${color}; box-shadow: 0 0 12px ${color};">
-                            <div class="marker-tooltip" style="border-color: ${color}; color: ${color};">
-                                ${d.team_name}
-                            </div>
-                        </div>
-                    `;
-                    
-                    el.onclick = () => {
-                        // Ζουμ στο γήπεδο με animation
-                        world.pointOfView({ lat: d.lat, lng: d.lng, altitude: 0.05 }, 1200);
-                        showSidebar(d);
-                    };
-                    
-                    return el;
-                });
+                // ΟΜΑΔΕΣ (Πινέζες & Γράμματα)
+                .labelsData([]) // Άδειο μέχρι να πατήσεις χώρα
+                .labelLat(d => d.lat)
+                .labelLng(d => d.lng)
+                .labelText(d => d.team_name)
+                .labelSize(0.8) // Μικρό μέγεθος για να μην πέφτει το ένα πάνω στο άλλο
+                .labelDotRadius(0.3)
+                .labelColor(d => d.id === 'aek_athens' ? '#F3D11A' : '#ffffff')
+                .labelResolution(2)
+                .onLabelClick(team => {
+                    // Ελαφρύ ζουμ στο γήπεδο
+                    world.pointOfView({ lat: team.lat, lng: team.lng, altitude: 0.2 }, 1000);
+                    showSidebar(team);
+                })
+                .labelLabel(d => `
+                    <div style="background: rgba(0,0,0,0.9); padding: 8px 12px; border-radius: 6px; border: 1px solid ${d.id === 'aek_athens' ? '#F3D11A' : '#fff'}; text-align: center;">
+                        <b style="font-size: 15px; color: ${d.id === 'aek_athens' ? '#F3D11A' : '#fff'};">${d.team_name}</b><br/>
+                        <span style="font-size: 12px; color: #bbb;">${d.stadium}</span>
+                    </div>
+                `);
 
-            // Αφαίρεση αυτόματης περιστροφής
             world.controls().autoRotate = false;
 
             const sidebar = document.getElementById('teamSidebar');
@@ -203,8 +171,8 @@
                    sidebar.style.borderLeftColor = '#F3D11A';
                 } else {
                    document.getElementById('sidebarTeamName').style.color = '#fff';
-                   document.getElementById('sidebarLeague').style.color = '#ff0055';
-                   sidebar.style.borderLeftColor = '#ff0055';
+                   document.getElementById('sidebarLeague').style.color = '#fff';
+                   sidebar.style.borderLeftColor = '#333';
                 }
 
                 sidebar.classList.add('active');
