@@ -11,6 +11,17 @@
         "jersey_url": "https://media.footballkitarchive.com/requests/images/2023/12/31/aek-athens-1994-1995-home-kit.png"
     },
     {
+        "id": "olympiacos",
+        "team_name": "Olympiacos",
+        "country": "Greece",
+        "city": "Piraeus",
+        "stadium": "Karaiskakis Stadium",
+        "lat": 37.946500,
+        "lng": 23.664400,
+        "trophies": "",
+        "jersey_url": ""
+    },
+    {
         "id": "real_madrid",
         "team_name": "Real Madrid",
         "country": "Spain",
@@ -19,7 +30,7 @@
         "lat": 40.453054,
         "lng": -3.688344,
         "trophies": "🏆 15x Champions League",
-        "jersey_url": "https://www.footballkitarchive.com/cdn/2025/09/12/8Bw9A9OSmONWZoS/aek-athens-2025-26-home-kit.jpg"
+        "jersey_url": "https://media.footballkitarchive.com/requests/images/2023/11/02/real-madrid-2023-24-home-kit.png"
     },
     {
         "id": "liverpool",
@@ -31,5 +42,16 @@
         "lng": -2.960830,
         "trophies": "🏆 6x Champions League",
         "jersey_url": "https://media.footballkitarchive.com/requests/images/2023/05/18/liverpool-2023-24-home-kit.png"
+    },
+    {
+        "id": "boca_juniors",
+        "team_name": "Boca Juniors",
+        "country": "Argentina",
+        "city": "Buenos Aires",
+        "stadium": "La Bombonera",
+        "lat": -34.635650,
+        "lng": -58.364650,
+        "trophies": "🏆 6x Copa Libertadores",
+        "jersey_url": ""
     }
 ]
