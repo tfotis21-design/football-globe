@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Football Globe - Night Edition</title>
+    <title>Football Globe - High Resolution</title>
     <style>
         body { margin: 0; padding: 0; overflow: hidden; background-color: #020202; font-family: 'Arial', sans-serif; color: #fff; }
-        #globeViz { width: 100vw; height: 100vh; }
+        #globeViz { width: 100vw; height: 100vh; cursor: grab; }
+        #globeViz:active { cursor: grabbing; }
         
         #teamSidebar {
             position: absolute; top: 0; right: -400px; width: 350px; height: 100vh;
@@ -20,12 +21,13 @@
         .close-btn { position: absolute; top: 15px; right: 20px; cursor: pointer; font-size: 28px; color: #888; transition: color 0.2s; }
         .close-btn:hover { color: #fff; }
         
-        .team-header { text-align: center; margin-bottom: 20px; }
-        .team-name { font-size: 26px; font-weight: 900; margin: 10px 0 5px 0; text-transform: uppercase; letter-spacing: 1px; }
-        .team-country { font-size: 14px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        .team-header { text-align: center; margin-bottom: 15px; }
+        .team-name { font-size: 26px; font-weight: 900; margin: 10px 0 2px 0; text-transform: uppercase; letter-spacing: 1px; }
+        .team-league { font-size: 13px; color: #00e5ff; text-transform: uppercase; letter-spacing: 1.5px; font-weight: bold; margin-bottom: 5px; }
+        .team-country { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
         
         .team-trophies {
-            font-size: 14px; color: #FFD700; font-weight: bold; margin-top: 10px;
+            font-size: 13px; color: #FFD700; font-weight: bold; margin-top: 10px;
             background: rgba(255, 215, 0, 0.05); padding: 8px; border-radius: 5px;
             display: none; border: 1px solid rgba(255, 215, 0, 0.2);
         }
@@ -40,12 +42,12 @@
             filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.5));
         }
         
-        .info-box { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #222; }
-        .info-label { font-size: 11px; color: #666; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; }
-        .info-value { font-size: 16px; font-weight: bold; }
+        .info-box { background: rgba(255,255,255,0.03); padding: 12px 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #222; }
+        .info-label { font-size: 10px; color: #666; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; }
+        .info-value { font-size: 15px; font-weight: bold; }
         
         #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px; z-index: 100; color: #fff; background: rgba(0,0,0,0.8); padding: 15px 30px; border-radius: 30px; }
-        #instructions { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 14px; color: #aaa; pointer-events: none; }
+        #instructions { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 14px; color: #aaa; pointer-events: none; background: rgba(0,0,0,0.6); padding: 8px 16px; border-radius: 20px; }
     </style>
     <script src="https://unpkg.com/globe.gl"></script>
 </head>
@@ -53,12 +55,13 @@
 
     <div id="loading">Φόρτωση χάρτη...</div>
     <div id="globeViz"></div>
-    <div id="instructions">Κάνε κλικ σε μια χώρα για να δεις τις ομάδες της.</div>
+    <div id="instructions">Κάνε κλικ σε μια χώρα. Σύρε για περιήγηση. Κάνε scroll για ζουμ.</div>
 
     <div id="teamSidebar">
         <div class="close-btn" id="closeSidebar">&times;</div>
         <div class="team-header">
             <h2 class="team-name" id="sidebarTeamName">Ομάδα</h2>
+            <div class="team-league" id="sidebarLeague">Πρωτάθλημα</div>
             <p class="team-country" id="sidebarCountry">Χώρα</p>
             <div class="team-trophies" id="sidebarTrophies">🏆</div>
         </div>
@@ -91,63 +94,67 @@
 
             world = Globe()
                 (document.getElementById('globeViz'))
-                // ΝΕΟΣ ΧΑΡΤΗΣ ΜΕ ΦΩΤΑ ΠΟΛΕΩΝ
+                // Υψηλότερη ανάλυση χάρτη (High-Res Night)
                 .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
                 .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
                 .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
-                
-                // ΕΝΕΡΓΟΠΟΙΗΣΗ ΑΤΜΟΣΦΑΙΡΑΣ (Μπλε λάμψη)
                 .showAtmosphere(true)
                 .atmosphereColor('#3a86ff')
                 .atmosphereAltitude(0.15)
-                .pointOfView({ lat: 38, lng: 23, altitude: 2.5 })
+                .pointOfView({ lat: 38, lng: 23, altitude: 2 })
                 
-                // ΣΥΝΟΡΑ ΧΩΡΩΝ (Διάφανα πλέον, φωτίζουν μόνο στο hover)
+                // Σύνορα Χωρών (Πολύγωνα)
                 .polygonsData(countriesData.features)
                 .polygonAltitude(0.005)
-                .polygonCapColor(() => 'rgba(0, 0, 0, 0)') // Εντελώς διάφανο για να φαίνονται τα φώτα
+                .polygonCapColor(() => 'rgba(0, 0, 0, 0)')
                 .polygonSideColor(() => 'rgba(0, 0, 0, 0)')
-                .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.1)') // Αχνά σύνορα
+                .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.15)')
                 .onPolygonHover(hoverD => {
-                    world.polygonCapColor(d => d === hoverD ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0)');
+                    world.polygonCapColor(d => d === hoverD ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0)');
                 })
                 .onPolygonClick(polygon => {
                     const countryName = polygon.properties.ADMIN;
                     const teamsInCountry = allTeams.filter(team => team.country === countryName);
+                    
                     world.labelsData(teamsInCountry);
+                    
                     const [lat, lng] = [polygon.properties.LABEL_Y, polygon.properties.LABEL_X];
                     if(lat && lng) {
-                        world.pointOfView({ lat: lat, lng: lng, altitude: 0.8 }, 1000);
+                        // ΒΑΘΥ ΖΟΥΜ: Το altitude: 0.15 πάει πολύ κοντά για να ξεχωρίζουν τα γήπεδα
+                        world.pointOfView({ lat: lat, lng: lng, altitude: 0.15 }, 1200);
                     }
                 })
 
-                // ΠΙΝΕΖΕΣ (Έντονο χρώμα όπως το BattleBots)
+                // Πινέζες Ομάδων
                 .labelsData([])
                 .labelLat(d => d.lat)
                 .labelLng(d => d.lng)
                 .labelText(() => '') 
                 .labelSize(0)
-                .labelDotRadius(0.8)
-                .labelColor(() => '#ff0055') // Έντονο νέον ροζ/κόκκινο
-                .labelResolution(2)
+                .labelDotRadius(0.1) // Μικρότερη κουκκίδα για μέγιστη ακρίβεια στο ζουμ
+                .labelColor(() => '#00e5ff') // Ένα φουτουριστικό γαλάζιο/κυανό
+                .labelResolution(3)
                 .onLabelClick(team => {
-                    world.pointOfView({ lat: team.lat, lng: team.lng, altitude: 0.4 }, 1000);
+                    // Ζουμάρει ακριβώς στο γήπεδο της ομάδας!
+                    world.pointOfView({ lat: team.lat, lng: team.lng, altitude: 0.05 }, 1000);
                     showSidebar(team);
                 })
                 .labelLabel(d => `
-                    <div style="background: rgba(0,0,0,0.9); padding: 8px 12px; border-radius: 6px; border: 1px solid #ff0055; text-align: center;">
+                    <div style="background: rgba(0,0,0,0.9); padding: 8px 12px; border-radius: 6px; border: 1px solid #00e5ff; text-align: center;">
                         <b style="font-size: 15px; color: #fff;">${d.team_name}</b><br/>
-                        <span style="font-size: 12px; color: #bbb;">${d.stadium}</span>
+                        <span style="font-size: 12px; color: #00e5ff;">${d.league}</span><br/>
+                        <span style="font-size: 11px; color: #bbb;">${d.stadium}</span>
                     </div>
                 `);
 
-            world.controls().autoRotate = true;
-            world.controls().autoRotateSpeed = 0.3;
+            // ΑΦΑΙΡΕΣΗ ΑΥΤΟΜΑΤΗΣ ΠΕΡΙΣΤΡΟΦΗΣ
+            world.controls().autoRotate = false;
 
             const sidebar = document.getElementById('teamSidebar');
             
             function showSidebar(team) {
                 document.getElementById('sidebarTeamName').innerText = team.team_name;
+                document.getElementById('sidebarLeague').innerText = team.league || "Unknown League";
                 document.getElementById('sidebarCountry').innerText = team.country;
                 document.getElementById('sidebarStadium').innerText = team.stadium;
                 document.getElementById('sidebarCity').innerText = team.city;
@@ -160,7 +167,6 @@
                     trophiesDiv.style.display = "none";
                 }
 
-                // Εικόνα Φανέλας
                 const jerseyImg = document.getElementById('jerseyImage');
                 if (team.jersey_url && team.jersey_url !== "") {
                     jerseyImg.src = team.jersey_url;
@@ -174,7 +180,7 @@
                    sidebar.style.borderLeftColor = '#F3D11A';
                 } else {
                    document.getElementById('sidebarTeamName').style.color = '#fff';
-                   sidebar.style.borderLeftColor = '#ff0055'; // Ταιριάζει με τις κόκκινες πινέζες
+                   sidebar.style.borderLeftColor = '#00e5ff';
                 }
 
                 sidebar.classList.add('active');
