@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Football Globe - Interactive</title>
+    <title>Football Globe - Premium</title>
     <style>
         body { margin: 0; padding: 0; overflow: hidden; background-color: #050505; font-family: 'Arial', sans-serif; color: #fff; }
         #globeViz { width: 100vw; height: 100vh; }
         
-        /* Το Sidebar (Μενού) */
         #teamSidebar {
             position: absolute; top: 0; right: -400px; width: 350px; height: 100vh;
             background: rgba(10, 10, 10, 0.95); border-left: 2px solid #333;
@@ -25,14 +24,12 @@
         .team-name { font-size: 26px; font-weight: 900; margin: 10px 0 5px 0; text-transform: uppercase; letter-spacing: 1px; }
         .team-country { font-size: 14px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
         
-        /* Κουτί Τροπαίων */
         .team-trophies {
             font-size: 14px; color: #FFD700; font-weight: bold; margin-top: 10px;
             background: rgba(255, 215, 0, 0.05); padding: 8px; border-radius: 5px;
             display: none; border: 1px solid rgba(255, 215, 0, 0.2);
         }
 
-        /* Κουτί Φανέλας */
         .jersey-container {
             width: 100%; height: 280px; background: transparent; border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
@@ -43,12 +40,10 @@
             filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.5));
         }
         
-        /* Πληροφορίες */
         .info-box { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #222; }
         .info-label { font-size: 11px; color: #666; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; }
         .info-value { font-size: 16px; font-weight: bold; }
         
-        /* Φόρτωση & Οδηγίες */
         #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px; z-index: 100; color: #fff; background: rgba(0,0,0,0.8); padding: 15px 30px; border-radius: 30px; }
         #instructions { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 14px; color: #aaa; pointer-events: none; }
     </style>
@@ -56,11 +51,10 @@
 </head>
 <body>
 
-    <div id="loading">Φόρτωση χάρτη & ομάδων...</div>
+    <div id="loading">Φόρτωση χάρτη...</div>
     <div id="globeViz"></div>
-    <div id="instructions">Περίστρεψε την υδρόγειο και κάνε κλικ σε μια χώρα.</div>
+    <div id="instructions">Κάνε κλικ σε μια χώρα για να δεις τις ομάδες της.</div>
 
-    <!-- Το Πλαϊνό Μενού -->
     <div id="teamSidebar">
         <div class="close-btn" id="closeSidebar">&times;</div>
         <div class="team-header">
@@ -87,7 +81,6 @@
         let allTeams = [];
         let world;
 
-        // Fetch δεδομένων (Γεωμετρία χωρών + το δικό σου JSON)
         Promise.all([
             fetch('https://raw.githubusercontent.com/vasturiano/globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson').then(res => res.json()),
             fetch('teams.json').then(res => res.json())
@@ -101,61 +94,51 @@
                 .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg')
                 .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
                 .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
-                .pointOfView({ lat: 38, lng: 23, altitude: 2 }) // Ξεκινάει πάνω από την Ελλάδα
+                .pointOfView({ lat: 38, lng: 23, altitude: 2 })
                 
-                // --- Ρυθμίσεις Χωρών ---
+                // 1. Polygons (Σύνορα Χωρών)
                 .polygonsData(countriesData.features)
                 .polygonAltitude(0.01)
                 .polygonCapColor(feat => 'rgba(10, 20, 30, 0.4)')
                 .polygonSideColor(() => 'rgba(0, 0, 0, 0.1)')
                 .polygonStrokeColor(() => '#333')
-                
-                // Hover effect στη χώρα
                 .onPolygonHover(hoverD => {
                     world.polygonCapColor(d => d === hoverD ? 'rgba(40, 80, 120, 0.8)' : 'rgba(10, 20, 30, 0.4)');
                 })
-                
-                // ΚΛΙΚ στη χώρα
                 .onPolygonClick(polygon => {
                     const countryName = polygon.properties.ADMIN;
-                    
-                    // Βρίσκει τις ομάδες της χώρας
                     const teamsInCountry = allTeams.filter(team => team.country === countryName);
-                    
-                    // Εμφανίζει τις πινέζες
                     world.labelsData(teamsInCountry);
-                    
-                    // Ζουμάρει
                     const [lat, lng] = [polygon.properties.LABEL_Y, polygon.properties.LABEL_X];
                     if(lat && lng) {
                         world.pointOfView({ lat: lat, lng: lng, altitude: 0.8 }, 1000);
                     }
                 })
 
-                // --- Ρυθμίσεις Ομάδων (Πινέζες) ---
-                .labelsData([]) // Άδειο στην αρχή
+                // 2. Πινέζες Ομάδων (ΧΩΡΙΣ τα μόνιμα μεγάλα γράμματα)
+                .labelsData([])
                 .labelLat(d => d.lat)
                 .labelLng(d => d.lng)
-                .labelText(d => d.team_name)
-                .labelSize(1.5)
-                .labelDotRadius(0.5)
+                .labelText(() => '') // Αφαιρέσαμε τα γράμματα για να είναι καθαρό!
+                .labelSize(0)
+                .labelDotRadius(0.8) // Κάναμε την τελεία ελαφρώς πιο μεγάλη
                 .labelColor(() => '#ffffff')
                 .labelResolution(2)
                 .onLabelClick(team => {
                     world.pointOfView({ lat: team.lat, lng: team.lng, altitude: 0.4 }, 1000);
                     showSidebar(team);
                 })
+                // Εδώ φτιάχνουμε το Tooltip (εμφανίζεται μόνο όταν περνάς το ποντίκι)
                 .labelLabel(d => `
-                    <div style="background: rgba(0,0,0,0.9); padding: 8px 12px; border-radius: 6px; border: 1px solid #555;">
-                        <b style="font-size: 14px;">${d.team_name}</b><br/>
-                        <span style="font-size: 11px; color: #bbb;">${d.stadium}</span>
+                    <div style="background: rgba(0,0,0,0.9); padding: 8px 12px; border-radius: 6px; border: 1px solid #555; text-align: center;">
+                        <b style="font-size: 15px; color: #fff;">${d.team_name}</b><br/>
+                        <span style="font-size: 12px; color: #bbb;">${d.stadium}</span>
                     </div>
                 `);
 
             world.controls().autoRotate = true;
             world.controls().autoRotateSpeed = 0.3;
 
-            // --- Λειτουργία Sidebar ---
             const sidebar = document.getElementById('teamSidebar');
             
             function showSidebar(team) {
@@ -164,7 +147,6 @@
                 document.getElementById('sidebarStadium').innerText = team.stadium;
                 document.getElementById('sidebarCity').innerText = team.city;
                 
-                // Τρόπαια
                 const trophiesDiv = document.getElementById('sidebarTrophies');
                 if (team.trophies && team.trophies !== "") {
                     trophiesDiv.innerText = team.trophies;
@@ -173,7 +155,6 @@
                     trophiesDiv.style.display = "none";
                 }
 
-                // Φανέλα
                 const jerseyImg = document.getElementById('jerseyImage');
                 if (team.jersey_url && team.jersey_url !== "") {
                     jerseyImg.src = team.jersey_url;
@@ -182,7 +163,6 @@
                     jerseyImg.style.display = "none";
                 }
 
-                // Χρώματα AEK
                 if (team.id === 'aek_athens') {
                    document.getElementById('sidebarTeamName').style.color = '#F3D11A';
                    sidebar.style.borderLeftColor = '#F3D11A';
@@ -199,7 +179,7 @@
             });
         }).catch(err => {
             console.error("Σφάλμα:", err);
-            document.getElementById('loading').innerText = "Αποτυχία φόρτωσης. Έλεγξε αν υπάρχει το teams.json";
+            document.getElementById('loading').innerText = "Σφάλμα! Διόρθωσε το όνομα του αρχείου σε teams.json";
         });
     </script>
 </body>
