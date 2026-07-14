@@ -80,15 +80,13 @@
             document.getElementById('loading').style.display = 'none';
             allTeams = teamsData;
 
-           world = Globe()
-               (document.getElementById('globeViz'))
-                // 8K High-Res Textures
-                .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg') 
+           world = Globe()(document.getElementById('globeViz'))
+                // High-Res Daylight Texture
+                .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg') 
                 .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
-                .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
-                
+                 // Αντί για νυχτερινό ουρανό, ένα καθαρό αθλητικό background μέσω CSS στο body (και βγάλε το backgroundImageUrl)
                 .showAtmosphere(true)
-                .atmosphereColor('#87CEEB')
+                .atmosphereColor('#3aeb34') // Ελαφριά αλλαγή της ατμόσφαιρας σε έναν πιο γήινο/ανοιχτό τόνο
                 .atmosphereAltitude(0.15)
                 .pointOfView({ lat: 38, lng: 23, altitude: 2 })
                 
