@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Football Globe - Flat & Fast</title>
-    
+    <title>Football Globe </title>
+     /* 2 γραμματοσειρές από την Google τις βρηκα ραντομ */
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
     
     <style>
-        /* Reset & Base */
+       
         body { 
             margin: 0; padding: 0; overflow: hidden; 
-            background-color: #0f172a; /* dark flat bg */
+            background-color: #0f172a; /* σκοταδι */
             font-family: 'Montserrat', sans-serif; 
             color: #f8fafc; 
         }
@@ -90,12 +90,15 @@
 </head>
 <body>
 
-    <div id="loading">Loading stadiums...</div>
+    <div id="loading">Loading ...</div>  
+    /* στο loading  */
     <div id="globeViz"></div>
     <div id="instructions">Click on a country to load teams.</div>
 
     <div id="teamSidebar">
+         /* το μερος που θα εχει data για καθε ομαδα */
         <div class="close-btn" id="closeSidebar">&times;</div>
+         /*και Χ για να κλεινει */
         <div class="team-header">
             <h2 class="team-name" id="sidebarTeamName">ΟΜΑΔΑ</h2>
             <div class="team-league" id="sidebarLeague">ΠΡΩΤΑΘΛΗΜΑ</div>
@@ -120,9 +123,9 @@
     <script>
         let allTeams = [];
         let world;
-        let selectedCountry = null; // gia na kseroume pou exoume kanei click
+        let selectedCountry = null;  /* μηδεν στο τσεπονι μας ωστε μετα να ξερουμε σε ποια χωρα εχουμε πατησει */ 
 
-        // Fortwnoume map & json
+        // κατεβαζω map & json
         Promise.all([
             fetch('https://raw.githubusercontent.com/vasturiano/globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson').then(res => res.json()),
             fetch('teams.json').then(res => res.json())
@@ -140,10 +143,10 @@
                 .atmosphereAltitude(0.15)
                 .pointOfView({ lat: 38.0361, lng: 23.7431, altitude: 2 }) // default view panw apo agia sofia
                 
-                // Polygons (Xwres)
+                // πολυγωνα
                 .polygonsData(countriesData.features)
                 .polygonAltitude(0.005)
-                .polygonCapColor(() => 'rgba(0, 0, 0, 0.5)') // skouro default
+                .polygonCapColor(() => 'rgba(0, 0, 0, 0.5)') // σκοατδι
                 .polygonSideColor(() => 'rgba(0, 0, 0, 0.5)')
                 .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.05)')
                 .onPolygonHover(hoverD => {
@@ -155,30 +158,30 @@
                     const countryName = polygon.properties.ADMIN;
                     selectedCountry = polygon;
                     
-                    // Kanoume to selected polygon ligo pio fwteino, ta alla pio skoura
+                    // επιλογη χωρασς
                     world.polygonCapColor(d => d === selectedCountry ? 'rgba(76, 175, 80, 0.3)' : 'rgba(0, 0, 0, 0.8)');
                     world.polygonSideColor(d => d === selectedCountry ? 'rgba(76, 175, 80, 0.3)' : 'rgba(0, 0, 0, 0.8)');
                     
-                    // Zoom sto kentro ths xwras based on GeoJSON properties
+                    // Zoom 
                     const lat = polygon.properties.LABEL_LAT || polygon.properties.CENTROID_LAT || 0;
                     const lng = polygon.properties.LABEL_LNG || polygon.properties.CENTROID_LNG || 0;
                     if (lat && lng) {
                         world.pointOfView({ lat: lat, lng: lng, altitude: 0.8 }, 1200);
                     }
 
-                    // Fortwnoume mono tis omades autis ths xwras
+                    // load μονο τις ομαδεςες της χωρας που εχουμε επιλεξει
                     const teamsInCountry = allTeams.filter(team => team.country === countryName);
                     if(teamsInCountry.length > 0) {
                         renderMarkers(groupTeamsByCity(teamsInCountry));
                     } else {
-                        // an den exei omades ketharizoume ta points
+                        // εδω κανονικα οταν θα βαλουμε ολες τις ομαδες καθε χωρα θα εχει ομαδες αρα δεν θα παει ποτε στο else
                         world.pointsData([]);
                     }
                 });
 
             world.controls().autoRotate = false;
 
-            // Omadopoihsh se clusters per city
+            // ομαδουλα 
             function groupTeamsByCity(teams) {
                 const groups = {};
                 teams.forEach(t => {
@@ -197,9 +200,9 @@
                 return elementsData;
             }
 
-            // Spaei to cluster se ksekxwrista points (kyklika)
+            //  (kyklika)
             function expandCluster(cluster) {
-                // dynamic radius gia na min peftoun panw h mia sthn allh se megales poleis px london
+                // εδω προσπαθω να μην π[εφτει πανω το ενα στο αλλ...αλλα μιεχ
                 let r = 0.08 + (cluster.teams.length * 0.02); 
                 
                 const expanded = cluster.teams.map((t, i) => {
@@ -212,15 +215,15 @@
                     };
                 });
 
-                // kratame ta ypoloipa kai kanoume inject ta expanded
+                
                 const current = world.pointsData().filter(d => d.city !== cluster.city);
                 world.pointsData([...current, ...expanded]);
                 
-                // zoom in sthn polh
+                // zoom in 
                 world.pointOfView({ lat: cluster.lat, lng: cluster.lng, altitude: 0.1 }, 1000);
             }
 
-            // Render metavash apo HTML se WebGL gia perrformance
+            // το βρηκα καπου στο στακ οβεργλοου για rrender
             function renderMarkers(data) {
                 world
                     .htmlElementsData([]) // ka8arisma ta palia html divs
@@ -253,7 +256,7 @@
                     });
             }
 
-            // UI Logic
+            // UI 
             const sidebar = document.getElementById('teamSidebar');
             
             function showSidebar(team) {
