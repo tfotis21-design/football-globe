@@ -3,118 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Football Globe - Realistic Day Edition & Clustering</title>
+    <title>Football Globe - Flat & Fast</title>
     
-    <!-- Εισαγωγή αθλητικών γραμματοσειρών από Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
     
     <style>
+        /* Reset & Base */
         body { 
             margin: 0; padding: 0; overflow: hidden; 
-            background: radial-gradient(circle at center, #1a2a3a 0%, #000000 100%); /* Πιο φωτεινό/αθλητικό background */
+            background-color: #0f172a; /* dark flat bg */
             font-family: 'Montserrat', sans-serif; 
-            color: #fff; 
+            color: #f8fafc; 
         }
         
-        #globeViz { width: 100vw; height: 100vh; cursor: grab; }
-        #globeViz:active { cursor: grabbing; }
+        #globeViz { width: 100vw; height: 100vh; cursor: crosshair; }
         
-        /* Βελτιωμένο Glassmorphism Sidebar */
+        /* Sidebar - No glassmorphism, no bullshit */
         #teamSidebar {
             position: absolute; top: 0; right: -420px; width: 380px; height: 100vh;
-            background: rgba(15, 20, 25, 0.7); 
-            border-left: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: -5px 0 25px rgba(0,0,0,0.5);
-            transition: right 0.5s cubic-bezier(0.25, 1, 0.5, 1); /* Πιο smooth transition */
+            background: #1e293b; 
+            border-left: 1px solid #334155;
+            transition: right 0.3s ease-in-out;
             padding: 30px 25px; box-sizing: border-box; z-index: 10; overflow-y: auto;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
         }
         #teamSidebar.active { right: 0; }
         
         .close-btn { 
             position: absolute; top: 15px; right: 20px; cursor: pointer; 
-            font-size: 32px; color: #aaa; transition: color 0.3s, transform 0.3s; 
-            font-family: Arial, sans-serif;
+            font-size: 28px; color: #94a3b8; transition: color 0.2s; 
         }
-        .close-btn:hover { color: #fff; transform: scale(1.1); }
+        .close-btn:hover { color: #f8fafc; }
         
-        .team-header { text-align: center; margin-bottom: 20px; }
+        .team-header { text-align: left; margin-bottom: 24px; border-bottom: 1px solid #334155; padding-bottom: 15px;}
         .team-name { 
-            font-family: 'Oswald', sans-serif; font-size: 32px; font-weight: 700; 
-            margin: 10px 0 5px 0; text-transform: uppercase; letter-spacing: 1.5px; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 700; 
+            margin: 0 0 5px 0; text-transform: uppercase; letter-spacing: 1px; 
         }
-        .team-league { font-size: 14px; color: #00e676; text-transform: uppercase; font-weight: 600; margin-bottom: 5px; }
-        .team-country { font-size: 12px; color: #bbb; text-transform: uppercase; letter-spacing: 2px; }
+        .team-league { font-size: 13px; color: #cbd5e1; text-transform: uppercase; font-weight: 600; }
+        .team-country { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
         
         .team-trophies { 
-            font-size: 13px; color: #FFD700; font-weight: bold; margin-top: 15px; 
-            background: rgba(255, 215, 0, 0.1); padding: 10px; border-radius: 8px; 
-            display: none; border: 1px solid rgba(255, 215, 0, 0.3); 
+            font-size: 12px; color: #fbbf24; font-weight: bold; margin-top: 10px; 
+            display: none; 
         }
         
         .jersey-container { 
-            width: 100%; height: 260px; background: rgba(0,0,0,0.2); 
-            border-radius: 12px; display: flex; align-items: center; justify-content: center; 
-            margin-bottom: 25px; position: relative; border: 1px solid rgba(255,255,255,0.05);
+            width: 100%; height: 220px; background: #0f172a; 
+            border-radius: 8px; display: flex; align-items: center; justify-content: center; 
+            margin-bottom: 24px; border: 1px solid #334155;
         }
-        .jersey-container img { max-width: 85%; max-height: 85%; object-fit: contain; filter: drop-shadow(0px 15px 20px rgba(0,0,0,0.6)); }
+        .jersey-container img { max-width: 80%; max-height: 80%; object-fit: contain; }
         
         .info-box { 
-            background: rgba(255,255,255,0.05); padding: 15px; 
-            border-radius: 10px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); 
-            transition: background 0.3s;
+            background: #0f172a; padding: 12px 15px; 
+            border-radius: 6px; margin-bottom: 10px; border: 1px solid #334155; 
         }
-        .info-box:hover { background: rgba(255,255,255,0.08); }
-        .info-label { font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 1.5px; font-weight: 600;}
-        .info-value { font-size: 16px; font-weight: 600; }
+        .info-label { font-size: 10px; color: #64748b; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 1px; }
+        .info-value { font-size: 14px; font-weight: 600; color: #e2e8f0; }
         
-        #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px; z-index: 100; color: #fff; background: rgba(0,0,0,0.8); padding: 15px 30px; border-radius: 30px; font-family: 'Oswald', sans-serif; letter-spacing: 1px;}
-        #instructions { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 14px; color: #ddd; pointer-events: none; background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 20px; backdrop-filter: blur(5px);}
+        /* Utils */
+        #loading { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            font-size: 14px; z-index: 100; color: #f8fafc; background: #1e293b; 
+            padding: 12px 24px; border-radius: 4px; border: 1px solid #334155;
+        }
+        #instructions { 
+            position: absolute; bottom: 20px; left: 20px; font-size: 12px; 
+            color: #94a3b8; pointer-events: none; background: #1e293b; 
+            padding: 8px 16px; border-radius: 4px; border: 1px solid #334155;
+        }
 
-        /* CSS για τα Markers (Κουκκίδες) πάνω στην υδρόγειο */
-        .marker-cluster {
-            width: 28px; height: 28px; border-radius: 50%;
-            background: linear-gradient(135deg, #00c6ff, #0072ff);
-            border: 2px solid #fff; color: white; display: flex;
-            align-items: center; justify-content: center; font-weight: bold;
-            font-size: 13px; font-family: 'Oswald', sans-serif;
-            box-shadow: 0 0 15px rgba(0, 114, 255, 0.8);
-            cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+        /* WebGL Tooltip */
+        .custom-tooltip {
+            background: #1e293b;
+            color: #f8fafc;
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: 1px solid #334155;
+            font-size: 12px;
+            font-family: 'Montserrat', sans-serif;
+            pointer-events: none;
         }
-        .marker-cluster:hover { transform: scale(1.3); box-shadow: 0 0 20px rgba(0, 114, 255, 1); }
-
-        .marker-team {
-            width: 18px; height: 18px; border-radius: 50%;
-            background: radial-gradient(circle, #ff3366 30%, #990033 100%);
-            border: 2px solid #fff;
-            box-shadow: 0 0 10px rgba(255, 51, 102, 0.6);
-            cursor: pointer; transition: transform 0.2s;
-        }
-        .marker-team.aek {
-            background: radial-gradient(circle, #F3D11A 30%, #9c8404 100%);
-            border-color: #000; box-shadow: 0 0 15px rgba(243, 209, 26, 0.8);
-        }
-        .marker-team:hover { transform: scale(1.5); }
-        
-        .marker-tooltip {
-            position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.8); padding: 5px 10px; border-radius: 6px;
-            font-size: 12px; white-space: nowrap; pointer-events: none;
-            opacity: 0; transition: opacity 0.2s; color: #fff;
-            border: 1px solid #444; text-align: center;
-        }
-        .marker-team:hover .marker-tooltip, .marker-cluster:hover .marker-tooltip { opacity: 1; }
-
     </style>
+    <!-- globe.gl apo CDN -->
     <script src="https://unpkg.com/globe.gl"></script>
 </head>
 <body>
 
-    <div id="loading">ΦΟΡΤΩΣΗ ΓΗΠΕΔΩΝ...</div>
+    <div id="loading">Loading stadiums...</div>
     <div id="globeViz"></div>
-    <div id="instructions">Κάνε κλικ σε μια χώρα για να δεις τις ομάδες.</div>
+    <div id="instructions">Click on a country to load teams.</div>
 
     <div id="teamSidebar">
         <div class="close-btn" id="closeSidebar">&times;</div>
@@ -142,8 +120,9 @@
     <script>
         let allTeams = [];
         let world;
-        let currentCountryTeams = []; // Κρατάει τις ομάδες της τρέχουσας χώρας
+        let selectedCountry = null; // gia na kseroume pou exoume kanei click
 
+        // Fortwnoume map & json
         Promise.all([
             fetch('https://raw.githubusercontent.com/vasturiano/globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson').then(res => res.json()),
             fetch('teams.json').then(res => res.json())
@@ -154,41 +133,52 @@
 
             world = Globe()
                 (document.getElementById('globeViz'))
-                // Ρεαλιστικά textures ημέρας
                 .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg') 
                 .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
                 .showAtmosphere(true)
-                .atmosphereColor('#42b6f5') // Πιο ανοιχτό/φωτεινό μπλε για ουρανό
+                .atmosphereColor('#42b6f5')
                 .atmosphereAltitude(0.15)
-                .pointOfView({ lat: 38.0361, lng: 23.7431, altitude: 2 }) // Αρχικό focus κοντά στην OPAP Arena
+                .pointOfView({ lat: 38.0361, lng: 23.7431, altitude: 2 }) // default view panw apo agia sofia
                 
+                // Polygons (Xwres)
                 .polygonsData(countriesData.features)
                 .polygonAltitude(0.005)
-                .polygonCapColor(() => 'rgba(255, 255, 255, 0)')
-                .polygonSideColor(() => 'rgba(255, 255, 255, 0)')
-                .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.15)')
+                .polygonCapColor(() => 'rgba(0, 0, 0, 0.5)') // skouro default
+                .polygonSideColor(() => 'rgba(0, 0, 0, 0.5)')
+                .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.05)')
                 .onPolygonHover(hoverD => {
-                    // Ελαφρύ "χλοοτάπητα" χρώμα στο hover αντί για άσπρο
-                    world.polygonCapColor(d => d === hoverD ? 'rgba(76, 175, 80, 0.15)' : 'rgba(255, 255, 255, 0)');
+                    if (hoverD !== selectedCountry) {
+                        world.polygonCapColor(d => d === hoverD ? 'rgba(59, 130, 246, 0.2)' : (d === selectedCountry ? 'rgba(76, 175, 80, 0.3)' : 'rgba(0, 0, 0, 0.5)'));
+                    }
                 })
                 .onPolygonClick(polygon => {
                     const countryName = polygon.properties.ADMIN;
-                    const teamsInCountry = allTeams.filter(team => team.country === countryName);
+                    selectedCountry = polygon;
                     
+                    // Kanoume to selected polygon ligo pio fwteino, ta alla pio skoura
+                    world.polygonCapColor(d => d === selectedCountry ? 'rgba(76, 175, 80, 0.3)' : 'rgba(0, 0, 0, 0.8)');
+                    world.polygonSideColor(d => d === selectedCountry ? 'rgba(76, 175, 80, 0.3)' : 'rgba(0, 0, 0, 0.8)');
+                    
+                    // Zoom sto kentro ths xwras based on GeoJSON properties
+                    const lat = polygon.properties.LABEL_LAT || polygon.properties.CENTROID_LAT || 0;
+                    const lng = polygon.properties.LABEL_LNG || polygon.properties.CENTROID_LNG || 0;
+                    if (lat && lng) {
+                        world.pointOfView({ lat: lat, lng: lng, altitude: 0.8 }, 1200);
+                    }
+
+                    // Fortwnoume mono tis omades autis ths xwras
+                    const teamsInCountry = allTeams.filter(team => team.country === countryName);
                     if(teamsInCountry.length > 0) {
-                        currentCountryTeams = teamsInCountry;
                         renderMarkers(groupTeamsByCity(teamsInCountry));
-                        
-                        // Υπολογισμός κέντρου
-                        const centerLat = teamsInCountry.reduce((sum, t) => sum + t.lat, 0) / teamsInCountry.length;
-                        const centerLng = teamsInCountry.reduce((sum, t) => sum + t.lng, 0) / teamsInCountry.length;
-                        world.pointOfView({ lat: centerLat, lng: centerLng, altitude: 0.6 }, 1500);
+                    } else {
+                        // an den exei omades ketharizoume ta points
+                        world.pointsData([]);
                     }
                 });
 
             world.controls().autoRotate = false;
 
-            // ΛΕΙΤΟΥΡΓΙΑ CLUSTERING (Ομαδοποίηση ανά Πόλη)
+            // Omadopoihsh se clusters per city
             function groupTeamsByCity(teams) {
                 const groups = {};
                 teams.forEach(t => {
@@ -199,82 +189,76 @@
                 const elementsData = [];
                 Object.values(groups).forEach(group => {
                     if (group.teams.length === 1) {
-                        // Αν η πόλη έχει μόνο 1 ομάδα, φτιάχνουμε κατευθείαν το marker της ομάδας
                         elementsData.push({ type: 'team', ...group.teams[0], displayLat: group.lat, displayLng: group.lng });
                     } else {
-                        // Αν η πόλη έχει πολλές ομάδες, φτιάχνουμε ένα cluster marker
                         elementsData.push({ type: 'cluster', lat: group.lat, lng: group.lng, city: group.city, teams: group.teams });
                     }
                 });
                 return elementsData;
             }
 
-            // Spiderify: Ανοίγει τις ομάδες γύρω από την πόλη
-            function expandCluster(clusterData) {
-                const radius = 0.12; // Απόσταση ανοίγματος σε μοίρες
-                const expandedTeams = clusterData.teams.map((t, index) => {
-                    const angle = (Math.PI * 2 / clusterData.teams.length) * index;
+            // Spaei to cluster se ksekxwrista points (kyklika)
+            function expandCluster(cluster) {
+                // dynamic radius gia na min peftoun panw h mia sthn allh se megales poleis px london
+                let r = 0.08 + (cluster.teams.length * 0.02); 
+                
+                const expanded = cluster.teams.map((t, i) => {
+                    const angle = (Math.PI * 2 / cluster.teams.length) * i;
                     return {
                         type: 'team',
                         ...t,
-                        displayLat: clusterData.lat + radius * Math.cos(angle),
-                        displayLng: clusterData.lng + radius * Math.sin(angle)
+                        displayLat: cluster.lat + r * Math.cos(angle),
+                        displayLng: cluster.lng + r * Math.sin(angle)
                     };
                 });
 
-                // Παίρνουμε τα τρέχοντα markers, αφαιρούμε το cluster που πατήθηκε και προσθέτουμε τις ξεχωριστές ομάδες
-                const currentData = world.htmlElementsData().filter(d => d.city !== clusterData.city);
-                world.htmlElementsData([...currentData, ...expandedTeams]);
+                // kratame ta ypoloipa kai kanoume inject ta expanded
+                const current = world.pointsData().filter(d => d.city !== cluster.city);
+                world.pointsData([...current, ...expanded]);
                 
-                // Ζουμ στην πόλη
-                world.pointOfView({ lat: clusterData.lat, lng: clusterData.lng, altitude: 0.2 }, 1200);
+                // zoom in sthn polh
+                world.pointOfView({ lat: cluster.lat, lng: cluster.lng, altitude: 0.1 }, 1000);
             }
 
-            // Δημιουργία HTML στοιχείων (Markers)
+            // Render metavash apo HTML se WebGL gia perrformance
             function renderMarkers(data) {
-                world.htmlElementsData(data)
-                    .htmlElement(d => {
-                        const el = document.createElement('div');
-                        
-                        if (d.type === 'cluster') {
-                            el.className = 'marker-cluster';
-                            el.innerText = d.teams.length;
-                            
-                            // Tooltip πόλης
-                            const tooltip = document.createElement('div');
-                            tooltip.className = 'marker-tooltip';
-                            tooltip.innerHTML = `<b>${d.city}</b><br>${d.teams.length} Ομάδες`;
-                            el.appendChild(tooltip);
-
-                            el.onclick = () => expandCluster(d);
-                        } 
-                        else if (d.type === 'team') {
-                            el.className = 'marker-team';
-                            if (d.id === 'aek_athens') el.classList.add('aek'); // Ειδικό styling
-                            
-                            // Tooltip ομάδας
-                            const tooltip = document.createElement('div');
-                            tooltip.className = 'marker-tooltip';
-                            tooltip.innerHTML = `<b style="color:${d.id==='aek_athens'?'#F3D11A':'#fff'};">${d.team_name}</b><br><span style="color:#aaa;">${d.stadium}</span>`;
-                            el.appendChild(tooltip);
-
-                            el.onclick = () => {
-                                world.pointOfView({ lat: d.displayLat, lng: d.displayLng, altitude: 0.15 }, 1000);
-                                showSidebar(d);
-                            };
-                        }
-                        return el;
+                world
+                    .htmlElementsData([]) // ka8arisma ta palia html divs
+                    .pointsData(data)
+                    .pointLat(d => d.type === 'cluster' ? d.lat : d.displayLat)
+                    .pointLng(d => d.type === 'cluster' ? d.lng : d.displayLng)
+                    .pointColor(d => {
+                        if (d.type === 'cluster') return '#3b82f6';
+                        if (d.id === 'aek_athens') return '#fbbf24'; // exception gia aek :p
+                        return '#ef4444';
                     })
-                    .htmlLat(d => d.type === 'cluster' ? d.lat : d.displayLat)
-                    .htmlLng(d => d.type === 'cluster' ? d.lng : d.displayLng);
+                    .pointAltitude(0.01)
+                    .pointRadius(d => d.type === 'cluster' ? 0.3 : 0.12)
+                    .pointResolution(32)
+                    .onPointClick(d => {
+                        if (d.type === 'cluster') {
+                            expandCluster(d);
+                        } else {
+                            world.pointOfView({ lat: d.displayLat, lng: d.displayLng, altitude: 0.15 }, 1000);
+                            showSidebar(d);
+                        }
+                    })
+                    .pointLabel(d => {
+                        // tooltips otan kaneis hover
+                        if (d.type === 'cluster') {
+                            return `<div class="custom-tooltip"><b>${d.city}</b><br>${d.teams.length} Ομάδες</div>`;
+                        }
+                        const c = d.id === 'aek_athens' ? '#fbbf24' : '#fff';
+                        return `<div class="custom-tooltip"><b style="color:${c};">${d.team_name}</b><br><span style="color:#94a3b8;">${d.stadium}</span></div>`;
+                    });
             }
 
-            // Sidebar Λογική
+            // UI Logic
             const sidebar = document.getElementById('teamSidebar');
             
             function showSidebar(team) {
                 document.getElementById('sidebarTeamName').innerText = team.team_name;
-                document.getElementById('sidebarLeague').innerText = team.league || "Unknown League";
+                document.getElementById('sidebarLeague').innerText = team.league || "Unknown";
                 document.getElementById('sidebarCountry').innerText = team.country;
                 document.getElementById('sidebarStadium').innerText = team.stadium;
                 document.getElementById('sidebarCity').innerText = team.city;
@@ -295,15 +279,14 @@
                     jerseyImg.style.display = "none";
                 }
 
-                // Χρωματισμός
                 if (team.id === 'aek_athens') {
-                   document.getElementById('sidebarTeamName').style.color = '#F3D11A';
-                   document.getElementById('sidebarLeague').style.color = '#F3D11A';
-                   sidebar.style.borderLeftColor = '#F3D11A';
+                   document.getElementById('sidebarTeamName').style.color = '#fbbf24';
+                   document.getElementById('sidebarLeague').style.color = '#fbbf24';
+                   sidebar.style.borderLeftColor = '#fbbf24';
                 } else {
-                   document.getElementById('sidebarTeamName').style.color = '#fff';
-                   document.getElementById('sidebarLeague').style.color = '#00e676';
-                   sidebar.style.borderLeftColor = 'rgba(255, 255, 255, 0.15)';
+                   document.getElementById('sidebarTeamName').style.color = '#f8fafc';
+                   document.getElementById('sidebarLeague').style.color = '#cbd5e1';
+                   sidebar.style.borderLeftColor = '#334155';
                 }
 
                 sidebar.classList.add('active');
@@ -312,9 +295,10 @@
             document.getElementById('closeSidebar').addEventListener('click', () => {
                 sidebar.classList.remove('active');
             });
+            
         }).catch(err => {
-            console.error("Σφάλμα:", err);
-            document.getElementById('loading').innerText = "Σφάλμα φόρτωσης. Έλεγξε το teams.json";
+            console.error("error fetching data:", err);
+            document.getElementById('loading').innerText = "Data load error. Check console.";
         });
     </script>
 </body>
