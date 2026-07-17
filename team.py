@@ -3,12 +3,10 @@ import json
 import time
 import os
 
-# ==========================================
-# CONFIGURATION & CONSTANTS
-# ==========================================
+
 API_KEY = "d6a9f9360c006ed94eb8ebabafe25ad9"
 SEASON = 2024
-MAX_COUNTRIES = 15  # Το όριο μειώθηκε στις 15 χώρες για γρήγορες δοκιμές
+MAX_COUNTRIES = 15  # Το όριο  15 χώρες γιati einai tzampa
 DELAY_BETWEEN_REQUESTS = 7
 
 HEADERS = {
@@ -20,25 +18,23 @@ HEADERS = {
 CITY_CACHE = {}
 
 
-# ==========================================
-# HELPER FUNCTIONS
-# ==========================================
+
 def get_city_coordinates(city, country):
     """
-    Βρίσκει τις συντεταγμένες της πόλης μέσω του δωρεάν OpenStreetMap API.
+    Βρίσκει τις συντεταγμένες της πόλης OpenStreetMap API.
     """
     if not city or not country:
         return None, None
 
     cache_key = f"{city}_{country}".lower()
 
-    # Αν έχουμε ήδη βρει την πόλη για άλλη ομάδα, δώσε τις συντεταγμένες από τη μνήμη
+    
     if cache_key in CITY_CACHE:
         return CITY_CACHE[cache_key]
 
     url = f"https://nominatim.openstreetmap.org/search?city={city}&country={country}&format=json"
 
-    # Το Nominatim απαιτεί User-Agent
+
     headers = {"User-Agent": "FootballGlobeProject/1.0"}
 
     try:
@@ -50,7 +46,7 @@ def get_city_coordinates(city, country):
                 lng = float(data[0]['lon'])
                 CITY_CACHE[cache_key] = (lat, lng)
 
-                # Αναμονή 1.2s γιατί το Nominatim έχει όριο 1 request / δευτερόλεπτο
+                # Αναμονή 1.2s γιατί το Nominatim έχει όριο 1 request / δευτερόλεπτο....γιατί τα βρήκα σκούρα
                 time.sleep(1.2)
                 return lat, lng
     except Exception:
@@ -61,7 +57,7 @@ def get_city_coordinates(city, country):
 
 def get_trophies_data(team_name):
     if "AEK" in team_name:
-        return "🏆 13x Πρωταθλήματα, 16x Κύπελλα"
+        return " 13x Πρωταθλήματα, 16x Κύπελλα"
     return ""
 
 
@@ -105,9 +101,7 @@ def get_first_division_leagues():
     return all_leagues[:MAX_COUNTRIES]
 
 
-# ==========================================
-# MAIN DATA BUILDER
-# ==========================================
+
 def build_teams_data():
     all_league_ids = get_first_division_leagues()
 
@@ -147,9 +141,7 @@ def build_teams_data():
                 city = venue.get('city', 'Unknown')
                 stadium = venue.get('name', 'Unknown Stadium')
 
-                # ----------------------------------------------------
-                # Η ΝΕΑ ΛΟΓΙΚΗ ΓΙΑ ΤΙΣ ΣΥΝΤΕΤΑΓΜΕΝΕΣ (Γεωεντοπισμός)
-                # ----------------------------------------------------
+           
                 lat, lng = get_city_coordinates(city, country)
 
                 if lat is None or lng is None:
@@ -176,7 +168,7 @@ def build_teams_data():
 
             print(f"   -> Εντοπίστηκαν στο χάρτη και προστέθηκαν {teams_added} ομάδες.")
 
-            # Αναμονή για το Rate Limit του API-Football (10 req / λεπτό)
+         
             time.sleep(DELAY_BETWEEN_REQUESTS)
 
         except Exception as e:
@@ -185,9 +177,7 @@ def build_teams_data():
     return all_teams
 
 
-# ==========================================
-# EXECUTION
-# ==========================================
+
 if __name__ == "__main__":
     start_time = time.time()
 
