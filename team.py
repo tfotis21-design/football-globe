@@ -4,7 +4,7 @@ import time
 import os
 
 
-API_KEY = "d6a9f9360c006ed94eb8ebabafe25ad9"
+API_KEY = ""
 SEASON = 2024
 MAX_COUNTRIES = 15  # Το όριο  15 χώρες γιati einai tzampa
 DELAY_BETWEEN_REQUESTS = 7
